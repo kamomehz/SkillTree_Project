@@ -1,0 +1,32 @@
+[
+    {
+        "path": "技术.机器人.Fanuc",
+        "name": "Karel",
+        "proficiency": 3,
+        "priority": 2,
+        "紧迫度总分": 4,
+        "memo": ""
+    },
+    {
+        "path": "技术.机器人.Fanuc",
+        "name": "机器人编程",
+        "proficiency": 5,
+        "priority": 2,
+        "紧迫度总分": 0,
+        "memo": ""
+    },
+    {
+        "name": "Office",
+        "path": "商务通用能力",
+        "proficiency": 4,
+        "priority": 2,
+        "memo": ""
+    },
+    {
+        "name": "会计资格",
+        "path": "商务通用能力",
+        "proficiency": 4,
+        "priority": 2,
+        "memo": "簿记2级"
+    }
+]
