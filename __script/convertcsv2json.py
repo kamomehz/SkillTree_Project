@@ -13,21 +13,38 @@ df['能力（中国語）'] = df['能力（中国語）'].ffill()
 level_map = {'簡単': 2, '普通': 1, '困難': 0}
 
 skills_list = []
+paths_list = []
 for _, row in df.dropna(subset=['子能力（中国語）']).iterrows():
     skills_list.append({
-        "id": int(row['番号']),
-        "category": row['類別'],
         "path": f"{row['類別']}.{row['能力（中国語）']}",
         "name": row['子能力（中国語）'],
-        "name_jp": row['サブ能力（日本語）'],
-        "proficiency": level_map.get(row['レベル'], 1),
-        "priority": 2, # 默认设为 2
-        "tags": [row['分類']]
+        "proficiency": 5,   # 固定为 5
+        "priority": 2,  # 默认设为 2 
+        "memo": row['分類']
     })
+# for _, row in df.dropna(subset=['子能力（中国語）']).iterrows():
+#     skills_list.append({
+#         "id": int(row['番号']),
+#         "category": row['類別'],
+#         "path": f"{row['類別']}.{row['能力（中国語）']}",
+#         "name": row['子能力（中国語）'],
+#         "name_jp": row['サブ能力（日本語）'],
+#         "proficiency": level_map.get(row['レベル'], 1),
+#         "priority": 2, # 默认设为 2
+#         "tags": [row['分類']]
+#     })
+
+for _, row in df.dropna(subset=['子能力（中国語）']).iterrows():
+    current_data = f"{row['類別']}.{row['能力（中国語）']}"
+    if current_data not in paths_list:
+        paths_list.append(current_data)
+
 
 # 写入文件
-os.makedirs('data_json', exist_ok=True)
-with open('data_json/skills.json', 'w', encoding='utf-8') as f:
+with open('__script/skills.json', 'w', encoding='utf-8') as f:
     json.dump(skills_list, f, indent=4, ensure_ascii=False)
 
-print("✅ 已成功将 164 条能力项转换至 data_json/skills.json")
+with open('__script/paths.json', 'w', encoding='utf-8') as f:
+    json.dump(paths_list, f, indent=4, ensure_ascii=False)
+
+print("✅ 已成功将 164 条能力项转换")

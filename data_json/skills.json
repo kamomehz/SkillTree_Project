@@ -1,32 +1,1150 @@
 [
     {
-        "path": "技术.机器人.Fanuc",
-        "name": "Karel",
-        "proficiency": 3,
-        "priority": 2,
-        "紧迫度总分": 4,
-        "memo": ""
-    },
-    {
-        "path": "技术.机器人.Fanuc",
-        "name": "机器人编程",
+        "path": "プロジェクトプロセス.项目实施基本流程",
+        "name": "项目实施流程",
         "proficiency": 5,
         "priority": 2,
-        "紧迫度总分": 0,
-        "memo": ""
+        "memo": "業務"
     },
     {
-        "name": "Office",
-        "path": "商务通用能力",
-        "proficiency": 4,
+        "path": "プロジェクトプロセス.業務流程",
+        "name": "業務流程图",
+        "proficiency": 5,
         "priority": 2,
-        "memo": ""
+        "memo": "業務"
     },
     {
-        "name": "会计资格",
-        "path": "商务通用能力",
-        "proficiency": 4,
+        "path": "プロジェクトプロセス.業務流程",
+        "name": "技术协议",
+        "proficiency": 5,
         "priority": 2,
-        "memo": "簿记2级"
+        "memo": "業務"
+    },
+    {
+        "path": "プロジェクトプロセス.通讯流程",
+        "name": "通讯流程图",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "プロジェクトプロセス.通讯流程",
+        "name": "通讯协议",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "プロジェクトプロセス.通讯流程",
+        "name": "网络拓扑图",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "ロボット.机器人模型",
+        "name": "机器人DH建模",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人模型",
+        "name": "在Mech-Viz普通导入机器人模型",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人模型",
+        "name": "机器人构型及分类",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人模型",
+        "name": "机器人软限位查询和修改",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人示教控制（关节角、末端姿态）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人切换TCP、切换base",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人TCP校准（几何中心和重心）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人末端姿态和关节角检查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人IP地址查询和修改",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人控制程序烧录",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人操作",
+        "name": "机器人运行程序查看和检查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人检查",
+        "name": "机器人零点检查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.机器人检查",
+        "name": "机器人零点校准",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "ロボット.理论知识",
+        "name": "机器人运动学（机器人正逆解、奇异点问题）、机器人动力学（速度加速度建模）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "ロボット.理论知识",
+        "name": "空间变换、四元数、欧拉角",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "ロボット.理论知识",
+        "name": "TCP标定精度问题（矩阵病态）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "ロボット.理论知识",
+        "name": "机器人轨迹アルゴリズム（转弯半径、轨迹精度、自动控制理论）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "機械電気設計.基本机械设备介绍",
+        "name": "基本机械原理介绍",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "機械電気設計.基本机械设备介绍",
+        "name": "常见夹具介绍",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "機械電気設計.基本机械设备介绍",
+        "name": "常见工作站布局介绍",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "機械電気設計.治具设计",
+        "name": "适合于金属件抓取的夹具设计",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "機械電気設計.治具设计",
+        "name": "适合于纸箱抓取的夹具设计",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "機械電気設計.基本电气设备介绍",
+        "name": "常见电气设备介绍",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机方案",
+        "name": "3D相机基本成像原理（双目，TOF，结构光structured light（散斑、面阵））",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机方案",
+        "name": "梅卡曼德相机分类，型号，选型方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机方案",
+        "name": "不同场景普通相机选型，安装方案",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机方案",
+        "name": "场景打光遮光方案",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机参数调节（2D图像和3D点云调节）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机IP地址查询和修改",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机内参检查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机内参快速矫正",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机调节小工具使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "白平衡调节",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机debug图像获取",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.相机操作",
+        "name": "相机日志获取",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.其他功能",
+        "name": "ROI设置",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.其他功能",
+        "name": "自动曝光助手",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.其他功能",
+        "name": "深度图分析器",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.问题排查",
+        "name": "相机IP，连接，网络问题排查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.问题排查",
+        "name": "Debug图获取及图像分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.问题排查",
+        "name": "相机日志查看，节拍分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Eye Viewer.问题排查",
+        "name": "Moba连接相机及操作指令（软件升级降级、相机问题排查）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Eye Viewer.理论知识",
+        "name": "2D场景中打光方案设计",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Eye Viewer.理论知识",
+        "name": "基础光学知识（光强、亮度、光谱、透镜）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Eye Viewer.理论知识",
+        "name": "常见3D成像问题及可能解决方案",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Eye Viewer.理论知识",
+        "name": "3D相机基本设计和构成",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Center.HUB及robotserver工作原理",
+        "name": "HUB工作原理及交互方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.HUB及robotserver工作原理",
+        "name": "RobotServer工作原理（与机器人的连接与控制）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Mech-Center基本操作",
+        "name": "设置一键启动、开机自启动、环境检查",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Mech-Center基本操作",
+        "name": "一键备份和恢复",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "Adapter生成器的使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "使用通讯调试助手对通讯程序进行调试",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "获取Mech-Vision和Mech-Viz的step属性和调用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "修改Adapter实现与Vision，Viz进行交互（修改信息，传入传出信息）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "主控类逻辑处理Adapter编写和测试（branch，notify）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "非主控类逻辑处理Adapter（插入第三方功能及アルゴリズム）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Center.Adapter",
+        "name": "Adapter定制界面设计（qt）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Center.Interface",
+        "name": "了解interface与支持的机器人及PLC工作交互原理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Interface",
+        "name": "Interface在机器人端的部署",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.Interface",
+        "name": "Interface在PLC端的部署（三菱、基恩士、欧姆龙）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.其他调试スキル",
+        "name": "查看Mech-Center及RobotServer日志并分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.其他调试スキル",
+        "name": "对Adapter日志和interface日志进行分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.其他调试スキル",
+        "name": "profinet调试和使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Center.理论知识",
+        "name": "TCP/IP通讯协议介绍",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "Mech-Center.理论知识",
+        "name": "工业以太网总线协议（modbus、EthernetIP、devicenet等）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "Mech-Viz.Viz的workflow",
+        "name": "基本Viz工程搭建",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Viz的workflow",
+        "name": "纸箱拆垛项目工程（多抓，夹具偏置）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Viz的workflow",
+        "name": "混合码垛、视觉码垛、其他垛型",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Viz的workflow",
+        "name": "Adapter(Interface)配合，主控逻辑操作",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Viz的workflow",
+        "name": "工具类Skill使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.夹具及被抓物体配置",
+        "name": "TCP的配置和模型导入",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.夹具及被抓物体配置",
+        "name": "对称性的理解和相关参数",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.夹具及被抓物体配置",
+        "name": "被抓物体属性配置",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Resource文件",
+        "name": "robot_param.json修改和编辑",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Resource文件",
+        "name": "Mech-Viz机器人模型导入",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "STL，OBJ夹具的使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "基本碰撞检测模型创建和使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "被抓非长方体的配置",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "动态碰撞模型的设置",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "移动任务碰撞检测",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.碰撞检测",
+        "name": "碰撞检测参数设置",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.规划历史和日志",
+        "name": "通过规划历史的问题分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.规划历史和日志",
+        "name": "通过日志的问题分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.视觉记录保存、复现与规划历史",
+        "name": "利用视觉结果的问题复现",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.视觉记录保存、复现与规划历史",
+        "name": "碰撞问题分析及解决",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "路径及轨迹优化",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "奇异点和不可达问题处理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "Mech-Viz规划机制（提前规划和规划分析）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "日志，规划历史检查和分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "夹具，机器人，场景模型简化",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "不同机器人构型设计及运动学（机器人模型添加与分析）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.综合内容",
+        "name": "Mech-Viz不同位姿",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Skill理解",
+        "name": "视觉移动",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Skill理解",
+        "name": "混合码垛（在线、离线）和其他码垛类任务",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.Skill理解",
+        "name": "分类（在视觉移动前和在视觉移动后）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Viz.理论知识",
+        "name": "混合码垛アルゴリズム",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "Mech-Viz.理论知识",
+        "name": "碰撞检测原理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "Mech-DL Kit.数据采集",
+        "name": "数据采集注意事项和规范",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.数据采集",
+        "name": "光照光源设计和控制",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "業務"
+    },
+    {
+        "path": "Mech-DL Kit.模型训练",
+        "name": "分类器数据采集和训练",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型训练",
+        "name": "目标检测和实例分割数据采集和训练",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型训练",
+        "name": "缺陷检测数据采集和训练",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型训练",
+        "name": "串联模型数据采集和训练",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.背景知识",
+        "name": "深度学习模型使用的条件",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.背景知识",
+        "name": "深度学习模型在视觉工程中发挥的作用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型使用和分析",
+        "name": "安装，配置，修复深度学习环境",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型使用和分析",
+        "name": "深度学习模型效果评估和优化经验",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-DL Kit.模型使用和分析",
+        "name": "深度学习日志分析和解决",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.掌握常见step的使用",
+        "name": "理解step的アルゴリズム原理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "Mech-Vision.掌握常见step的使用",
+        "name": "掌握参数含义并调参",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.金属件上下料工程",
+        "name": "理解深度学习+匹配+分类排序工程　トラックリンク",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.金属件上下料工程",
+        "name": "理解匹配工程（大型工件匹配识别）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.金属件上下料工程",
+        "name": "理解深度学习+匹配工程（小型工件识别）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.金属件上下料工程",
+        "name": "了解匹配参数含义",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.金属件上下料工程",
+        "name": "常见工件的工程搭建",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.拆垛工程",
+        "name": "理解多品类混拆工程/麻袋工程",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.拆垛工程",
+        "name": "理解单品类平拆工程",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.快递包裹，万物抓取",
+        "name": "学会调参以及万物抓取的识别原理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.掌握典型工程-高精度定位",
+        "name": "高精度定位工程实施的基本要求及调参方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.点云模板制作",
+        "name": "点云编辑器使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.点云模板制作",
+        "name": "模板制作小工具",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.点云模板制作",
+        "name": "拖拽法制作抓取点",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.点云模板制作",
+        "name": "示教法制作抓取点",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.小工具",
+        "name": "Vision配方",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.小工具",
+        "name": "工程精度测试小工具",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.小工具",
+        "name": "step编辑器（描述和高层参数）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "多种动态料框识别方案和实施方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "位姿编辑工具及位姿编辑多个STEP的配合使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "优化，识别，分析误差的方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "数据回放，统计分析误差与错误",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "其他软件（viz、adapter）配合调试",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "基于JavaScript的step编辑器",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Vision.综合要求",
+        "name": "基于qml的UI界面编辑",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "综合节拍优化",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "匹配类问题解决",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "点云处理类问题解决",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "日志分析",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "位姿需求类问题解决",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.优化和问题解决",
+        "name": "工程防错",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "外参标定的基本原理",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "六轴机器人EIH，ETH模式下手动，自动，三点法标定",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "四轴机器人EIH，ETH模式下手动，自动，三点法标定",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "桁架，特殊机器人外参标定方法",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "外参评估及优化",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "外参快速标定和适用场景",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.外参标定",
+        "name": "通过标志物矫正外参误差",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "スキル"
+    },
+    {
+        "path": "Mech-Vision.理论知识（常用拡張）",
+        "name": "空间变化及四元数",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "Mech-Vision.理论知识（常用拡張）",
+        "name": "PPF、GMM、ICP的匹配アルゴリズム",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "Mech-Vision.理论知识（常用拡張）",
+        "name": "基础2D图像处理和3D点云处理方法（OpenCV、PCL、Unbuntu）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "アルゴリズム"
+    },
+    {
+        "path": "その他.文档阅读，编写，排版能力",
+        "name": "Markdown文档的编写",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.编程能力",
+        "name": "Python基本编程能力，编写小脚本测试和使用",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.编程能力",
+        "name": "PLC编程能力",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.编程能力",
+        "name": "其他计算机语言能力（C/C++， JavaScript，Matlab）",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.编程能力",
+        "name": "机器人语言能力",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.文档表达能力",
+        "name": "PPT，思维导图等",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.文档表达能力",
+        "name": "草图，机械结构图，流程图",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.其他软件使用能力",
+        "name": "Blender及其他模型软件使用能力",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
+    },
+    {
+        "path": "その他.其他软件使用能力",
+        "name": "Solidworks及其他CAD软件使用能力",
+        "proficiency": 5,
+        "priority": 2,
+        "memo": "拡張"
     }
 ]
