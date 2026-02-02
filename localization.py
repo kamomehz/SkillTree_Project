@@ -89,6 +89,7 @@ LANGUAGES = {
         "delete_caption": "已录入的技能将保留该路径，但该路径将不再作为推荐选项出现在录入菜单中（除非它仍被技能使用）。",
         "delete_confirm_button": "确认删除",
         
+        "show_skill_nodes": "显示能力子节点",
         "graph_header": "🕸️ 知识框架全景图",
         "empty_graph_info": "💡 你的技能树还是空的，暂无图可显示。",
         
@@ -105,7 +106,17 @@ LANGUAGES = {
         "success_path_removed": "已从预设中移除: {path}",
         "info_path_not_in_presets": "该路径不在预设列表中 (可能是由技能数据自动生成的)。",
         "error_empty_name_in_table": "⚠️ 保存失败：存在【技能名称】为空的数据行。",
-        "success_data_updated": "数据已更新！"
+        "success_data_updated": "数据已更新！",
+        
+        "profile_selector_label": "选择配置文件",
+        "profile_management_header": "🗃️ 配置文件管理",
+        "add_profile_header": "创建新配置",
+        "new_profile_name_label": "新配置文件名称",
+        "new_profile_name_placeholder": "例如: '工作规划' 或 '学习目标'",
+        "create_profile_button": "创建新配置文件",
+        "profile_creation_success": "✅ 成功创建配置文件: {name}",
+        "profile_creation_error_exists": "❌ 创建失败: 配置文件 '{name}' 已存在。",
+        "profile_creation_error_empty": "❌ 请输入有效的配置文件名称。"
     },
     "en": {
         "page_title": "Personal Skill Tree",
@@ -175,8 +186,10 @@ LANGUAGES = {
         "rename_confirm_button": "Confirm Change",
         "delete_warning": "⚠️ Deleting path node '{path}' only removes it from the [Preset List].",
         "delete_caption": "Skills already entered will retain this path, but it will no longer appear as a recommended option in the input menu (unless still in use by a skill).",
-        "delete_confirm_button": "Confirm Deletion",
-        "graph_header": "🕸️ Knowledge Framework Panorama",
+                "delete_confirm_button": "Confirm Deletion",
+        
+                "show_skill_nodes": "Show skill sub-nodes",
+                "graph_header": "🕸️ Knowledge Framework Panorama",
         "empty_graph_info": "💡 Your skill tree is empty, no graph to display yet.",
         "error_skill_name_empty": "Please enter a skill name",
         "error_path_empty": "Please select a knowledge framework path",
@@ -190,7 +203,17 @@ LANGUAGES = {
         "success_path_removed": "Removed from presets: {path}",
         "info_path_not_in_presets": "This path is not in the preset list (it might be auto-generated from skill data).",
         "error_empty_name_in_table": "⚠️ Save failed: A row with an empty [Skill Name] exists.",
-        "success_data_updated": "Data has been updated!"
+        "success_data_updated": "Data has been updated!",
+        
+        "profile_selector_label": "Select Profile",
+        "profile_management_header": "🗃️ Profile Management",
+        "add_profile_header": "Create New Profile",
+        "new_profile_name_label": "New Profile Name",
+        "new_profile_name_placeholder": "e.g., 'Career Plan' or 'Learning Goals'",
+        "create_profile_button": "Create New Profile",
+        "profile_creation_success": "✅ Successfully created profile: {name}",
+        "profile_creation_error_exists": "❌ Creation failed: Profile '{name}' already exists.",
+        "profile_creation_error_empty": "❌ Please enter a valid profile name."
     },
     "ja": {
         "page_title": "個人スキルツリー",
@@ -260,8 +283,10 @@ LANGUAGES = {
         "rename_confirm_button": "変更を確定",
         "delete_warning": "⚠️ パスノード '{path}' の削除は【プリセットリスト】からのみ削除します。",
         "delete_caption": "既に入力されたスキルはこのパスを保持しますが、入力メニューの推奨オプションとしては表示されなくなります（スキルによってまだ使用されている場合を除く）。",
-        "delete_confirm_button": "削除を確定",
-        "graph_header": "🕸️ 知識フレームワークパノラマ",
+                "delete_confirm_button": "削除を確定",
+        
+                "show_skill_nodes": "スキルサブノードを表示",
+                "graph_header": "🕸️ 知識フレームワークパノラマ",
         "empty_graph_info": "💡 スキルツリーは空で、表示するグラフがまだありません。",
         "error_skill_name_empty": "スキル名を入力してください",
         "error_path_empty": "知識フレームワークパスを選択してください",
@@ -275,6 +300,16 @@ LANGUAGES = {
         "success_path_removed": "プリセットから削除しました: {path}",
         "info_path_not_in_presets": "このパスはプリセットリストにありません（スキルデータから自動生成された可能性があります）。",
         "error_empty_name_in_table": "⚠️ 保存失敗：[スキル名]が空の行が存在します。",
-        "success_data_updated": "データが更新されました！"
+        "success_data_updated": "データが更新されました！",
+        
+        "profile_selector_label": "プロファイルを選択",
+        "profile_management_header": "🗃️ プロファイル管理",
+        "add_profile_header": "新規プロファイル作成",
+        "new_profile_name_label": "新しいプロファイル名",
+        "new_profile_name_placeholder": "例: 「キャリアプラン」や「学習目標」",
+        "create_profile_button": "新しいプロファイルを作成",
+        "profile_creation_success": "✅ プロファイルが正常に作成されました: {name}",
+        "profile_creation_error_exists": "❌ 作成に失敗しました: プロファイル '{name}' は既に存在します。",
+        "profile_creation_error_empty": "❌ 有効なプロファイル名を入力してください。"
     }
 }

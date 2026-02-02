@@ -23,31 +23,44 @@ def get_font_css(language):
     return f"<style>body {{ font-family: {font_family}; }}</style>"
 
 # --- Data Logic ---
-DATA_DIR = "data_json"
-DATA_FILE = os.path.join(DATA_DIR, "skills.json")
-PATHS_FILE = os.path.join(DATA_DIR, "paths.json")
+DB_ROOT = "databases"
 
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
+def get_profiles():
+    if not os.path.exists(DB_ROOT):
+        os.makedirs(os.path.join(DB_ROOT, "default"))
+    return sorted([d for d in os.listdir(DB_ROOT) if os.path.isdir(os.path.join(DB_ROOT, d))])
 
-def load_data():
-    if not os.path.exists(DATA_FILE): return []
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
+def get_profile_path(profile_name):
+    return os.path.join(DB_ROOT, profile_name)
+
+def load_data(profile):
+    data_file = os.path.join(get_profile_path(profile), "skills.json")
+    if not os.path.exists(data_file): return []
+    with open(data_file, 'r', encoding='utf-8') as f:
         try: return json.load(f)
         except json.JSONDecodeError: return []
 
-def load_defined_paths():
-    if not os.path.exists(PATHS_FILE): return []
-    with open(PATHS_FILE, 'r', encoding='utf-8') as f:
+def load_defined_paths(profile):
+    paths_file = os.path.join(get_profile_path(profile), "paths.json")
+    if not os.path.exists(paths_file): return []
+    with open(paths_file, 'r', encoding='utf-8') as f:
         try: return json.load(f)
         except json.JSONDecodeError: return []
 
-def save_data(data):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
+def save_data(data, profile):
+    profile_path = get_profile_path(profile)
+    if not os.path.exists(profile_path):
+        os.makedirs(profile_path)
+    data_file = os.path.join(profile_path, "skills.json")
+    with open(data_file, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-def save_defined_paths(paths):
-    with open(PATHS_FILE, 'w', encoding='utf-8') as f:
+def save_defined_paths(paths, profile):
+    profile_path = get_profile_path(profile)
+    if not os.path.exists(profile_path):
+        os.makedirs(profile_path)
+    paths_file = os.path.join(profile_path, "paths.json")
+    with open(paths_file, 'w', encoding='utf-8') as f:
         json.dump(paths, f, indent=4, ensure_ascii=False)
 
 def calculate_urgency(skills):
@@ -57,7 +70,7 @@ def calculate_urgency(skills):
         s['urgency_score'] = prio * (5 - prof)
     return sorted(skills, key=lambda x: x['urgency_score'], reverse=True)
 
-def generate_tree_dot(skills, all_paths):
+def generate_tree_dot(skills, all_paths, show_leaves=True):
     """生成 Graphviz DOT 格式的树状图数据，并对齐层级"""
     dot = ['digraph G {']
     dot.append('  rankdir=LR;')
@@ -77,27 +90,28 @@ def generate_tree_dot(skills, all_paths):
             levels[i + 1].add(f'"{part}"')
             parent = part
             
-    for s in skills:
-        path = s.get('path', '')
-        parts = [p.strip() for p in path.split('.') if p.strip()]
-        parent = root_node_label
-        if parts:
-            parent = parts[-1]
+    if show_leaves:
+        for s in skills:
+            path = s.get('path', '')
+            parts = [p.strip() for p in path.split('.') if p.strip()]
+            parent = root_node_label
+            if parts:
+                parent = parts[-1]
 
-        name = s['name'].replace('"', '\"')
-        prof = int(s.get('proficiency', 0))
-        prio = int(s.get('priority', 0))
-        display_name = f"{name} {'*' * prio}"
-        
-        if prof == 0: color = "#e0e0e0"
-        elif prof == 1: color = "#ffcccc"
-        elif prof <= 3: color = "#fff4cc"
-        else: color = "#ccffcc"
-        
-        leaf_id = f"skill_{s['name']}_{s.get('path','')}"
-        dot.append(f'  "{leaf_id}" [label="{display_name}", shape=note, fillcolor="{color}"];')
-        edges.add(f'"{parent}" -> "{leaf_id}"')
-        levels[len(parts) + 1].add(f'"{leaf_id}"')
+            name = s['name'].replace('"', '\"')
+            prof = int(s.get('proficiency', 0))
+            prio = int(s.get('priority', 0))
+            display_name = f"{name} {'*' * prio}"
+            
+            if prof == 0: color = "#e0e0e0"
+            elif prof == 1: color = "#ffcccc"
+            elif prof <= 3: color = "#fff4cc"
+            else: color = "#ccffcc"
+            
+            leaf_id = f"skill_{s['name']}_{s.get('path','')}"
+            dot.append(f'  "{leaf_id}" [label="{display_name}", shape=note, fillcolor="{color}"];')
+            edges.add(f'"{parent}" -> "{leaf_id}"')
+            levels[len(parts) + 1].add(f'"{leaf_id}"')
 
     # 2. 添加所有边
     for edge in sorted(list(edges)):
@@ -123,8 +137,8 @@ def build_path_tree(paths):
             current = current[part]
     return tree
 
-def update_path_references(old_path, new_path, recursive=True):
-    skills, updated_count = load_data(), 0
+def update_path_references(profile, old_path, new_path, recursive=True):
+    skills, updated_count = load_data(profile), 0
     for s in skills:
         p = s.get('path', '')
         if p == old_path:
@@ -132,48 +146,106 @@ def update_path_references(old_path, new_path, recursive=True):
         elif recursive and p.startswith(old_path + '.'):
             s['path'] = new_path + p[len(old_path):]
             updated_count += 1
-    save_data(skills)
-    paths, new_paths, changed = load_defined_paths(), [], False
+    save_data(skills, profile)
+    paths, new_paths, changed = load_defined_paths(profile), [], False
     for p in paths:
         if p == old_path: new_paths.append(new_path); changed = True
         elif recursive and p.startswith(old_path + '.'): new_paths.append(new_path + p[len(old_path):]); changed = True
         else: new_paths.append(p)
-    if changed: save_defined_paths(sorted(list(set(new_paths))))
+    if changed: save_defined_paths(sorted(list(set(new_paths))), profile)
     return updated_count
 
 # --- Main App ---
 st.set_page_config(page_title=t("page_title"), layout="wide")
 st.markdown(get_font_css(st.session_state.lang), unsafe_allow_html=True)
 
-all_data = load_data()
-defined_paths = load_defined_paths()
+
+# --- Profile Initialization ---
+profiles = get_profiles()
+if 'active_profile' not in st.session_state or st.session_state.active_profile not in profiles:
+    st.session_state.active_profile = profiles[0] if profiles else "default"
+
+active_profile = st.session_state.active_profile
+all_data = load_data(active_profile)
+defined_paths = load_defined_paths(active_profile)
 existing_skill_paths = [d.get('path', '') for d in all_data if d.get('path')]
 all_paths = sorted(list(set(existing_skill_paths + defined_paths)))
 
-# --- Top-Right Controls ---
-_, col1, col2 = st.columns([0.6, 0.2, 0.2])
+
+    
+# --- New Header Controls ---
+if 'page' not in st.session_state:
+    st.session_state.page = t("home_view")
+
+def set_page(page_name):
+    st.session_state.page = page_name
+
+col1, col2 = st.columns([0.6, 0.4])
 
 with col1:
-    lang_map = {'zh': '中文', 'en': 'English', 'ja': '日本語'}
-    selected_lang_label = st.selectbox(
-        label=t("language"),
-        options=lang_map.keys(),
-        format_func=lambda x: lang_map[x],
-        key="lang_selector_top",
-        label_visibility="collapsed"
-    )
-    if st.session_state.lang != selected_lang_label:
-        st.session_state.lang = selected_lang_label
-        st.rerun()
+    with st.container(border=True):
+        cols = st.columns(2)
+        with cols[0]:
+            st.button(
+                t("home_view"), 
+                on_click=set_page, 
+                args=(t("home_view"),), 
+                use_container_width=True, 
+                type="primary" if st.session_state.page == t("home_view") else "secondary"
+            )
+        with cols[1]:
+            st.button(
+                t("manage_view"), 
+                on_click=set_page, 
+                args=(t("manage_view"),), 
+                use_container_width=True, 
+                type="primary" if st.session_state.page == t("manage_view") else "secondary"
+            )
 
 with col2:
-    page = st.radio(
-        label=t("view_switcher"),
-        options=[t("home_view"), t("manage_view")],
-        key="view_switcher_top",
-        horizontal=True,
-        label_visibility="collapsed"
-    )
+    with st.container(border=True):
+        cols = st.columns([0.5, 0.5])
+        with cols[0]:
+            lang_map = {'zh': '中文', 'en': 'English', 'ja': '日本語'}
+            selected_lang_label = st.selectbox(
+                label=t("language"),
+                options=lang_map.keys(),
+                format_func=lambda x: lang_map[x],
+                key="lang_selector_top",
+                label_visibility="collapsed"
+            )
+            if st.session_state.lang != selected_lang_label:
+                st.session_state.lang = selected_lang_label
+                st.rerun()
+
+        with cols[1]:
+            with st.popover("🗃️ " + t("profile_management_header")):
+                st.selectbox(
+                    label=t("profile_selector_label"),
+                    options=profiles, # profiles is already defined from the initialization block
+                    key="active_profile"
+                )
+                st.markdown("---")
+                st.subheader(t("add_profile_header"))
+                new_profile_name = st.text_input(t("new_profile_name_label"), placeholder=t("new_profile_name_placeholder"))
+                if st.button(t("create_profile_button"), use_container_width=True):
+                    if new_profile_name:
+                        sanitized_name = new_profile_name.strip().replace("..", "").replace("/", "").replace("\\", "")
+                        if sanitized_name:
+                            new_profile_path = get_profile_path(sanitized_name)
+                            if not os.path.exists(new_profile_path):
+                                os.makedirs(new_profile_path)
+                                st.success(t("profile_creation_success").format(name=sanitized_name))
+                                st.rerun()
+                            else:
+                                st.error(t("profile_creation_error_exists").format(name=sanitized_name))
+                        else:
+                            st.warning(t("profile_creation_error_empty"))
+                    else:
+                        st.warning(t("profile_creation_error_empty"))
+
+# Get the page value for the main logic
+page = st.session_state.page
     
 with st.sidebar:
     st.title(t("nav_title"))
@@ -219,15 +291,15 @@ if page == t("home_view"):
             memo = st.text_area(t("memo_label"), placeholder=t("memo_placeholder"), height=68, key="input_memo")
         if st.button(t("submit_button"), type="primary", use_container_width=True):
             if name and selected_path:
-                current_data = load_data()
+                current_data = load_data(active_profile)
                 current_data.append({"name": name, "path": selected_path, "proficiency": proficiency, "priority": priority, "memo": memo})
-                save_data(current_data)
+                save_data(current_data, active_profile)
                 st.success(t("success_skill_added").format(name=name))
                 st.session_state.submit_success = True
                 st.rerun()
             else: st.error(t("error_skill_name_empty") if not name else t("error_path_empty"))
 
-    raw_skills = load_data()
+    raw_skills = load_data(active_profile)
     filtered_data = raw_skills
     skills = calculate_urgency(filtered_data)
     if skills:
@@ -240,7 +312,7 @@ if page == t("home_view"):
                 st.caption(t("path_metric").format(path=skill['path']))
         st.markdown("---")
         st.subheader(t("panorama_header"))
-        tab1, tab2 = st.tabs([t("tab_list"), t("tab_tree")])
+        tab2, tab1 = st.tabs([t("tab_tree"), t("tab_list")])
         with tab1:
             df = pd.DataFrame(skills).sort_values(by=['path', 'urgency_score'], ascending=[True, False])
             if 'memo' not in df.columns: df['memo'] = ""
@@ -255,7 +327,7 @@ if page == t("home_view"):
                     if df_save['name'].isnull().any() or (df_save['name'].astype(str).str.strip() == "").any(): st.error(t("error_empty_name_in_table")); st.stop()
                     df_save['path'] = df_save['path'].str.replace(' ➤ ', '.', regex=False)
                     if 'urgency_score' in df_save.columns: df_save = df_save.drop(columns=['urgency_score'])
-                    save_data(df_save.to_dict('records')); st.success(t("success_data_updated")); st.rerun()
+                    save_data(df_save.to_dict('records'), active_profile); st.success(t("success_data_updated")); st.rerun()
             else:
                 def get_prof_color(val):
                     if val == 0: return 'background-color: #e0e0e0'
@@ -268,7 +340,9 @@ if page == t("home_view"):
                     else: return 'background-color: #ccffcc'
                 st.dataframe(df_display.style.map(get_prof_color, subset=[t('col_proficiency')]).map(get_prio_color, subset=[t('col_priority')]), hide_index=True)
         with tab2:
-            st.caption(t("tree_legend")); st.graphviz_chart(generate_tree_dot(skills, all_paths))
+            show_leaves = st.toggle(t("show_skill_nodes"), value=True, key="toggle_leaves_home")
+            st.caption(t("tree_legend"))
+            st.graphviz_chart(generate_tree_dot(skills, all_paths, show_leaves=show_leaves))
     else: st.info(t("empty_tree_info"))
 elif page == t("manage_view"):
     st.title(t("manage_page_title"))
@@ -276,7 +350,9 @@ elif page == t("manage_view"):
     with st.container(border=True):
         st.subheader(t("graph_header"))
         if all_data or all_paths:
-            st.caption(t("tree_legend")); st.graphviz_chart(generate_tree_dot(all_data, all_paths))
+            show_leaves_manage = st.toggle(t("show_skill_nodes"), value=True, key="toggle_leaves_manage")
+            st.caption(t("tree_legend"))
+            st.graphviz_chart(generate_tree_dot(all_data, all_paths, show_leaves=show_leaves_manage))
         else: st.info(t("empty_graph_info"))
     st.markdown("---")
     col1, col2 = st.columns(2)
@@ -292,9 +368,9 @@ elif page == t("manage_view"):
                     if not new_part: st.warning(t("error_name_empty"))
                     else:
                         new_path_def = f"{selected_parent}.{new_part}" if selected_parent != t("parent_top_level") else new_part
-                        current_paths = load_defined_paths()
+                        current_paths = load_defined_paths(active_profile)
                         if new_path_def not in current_paths:
-                            current_paths.append(new_path_def); save_defined_paths(sorted(list(set(current_paths))))
+                            current_paths.append(new_path_def); save_defined_paths(sorted(list(set(current_paths))), active_profile)
                             st.success(t("success_path_added").format(path=new_path_def)); st.rerun()
                         else: st.warning(t("warning_path_exists"))
                 else: st.warning(t("error_path_input_empty"))
@@ -302,12 +378,13 @@ elif page == t("manage_view"):
                 manual_path_def = st.text_input(t("manual_path_input"), key="manual_path_def_page")
                 if st.button(t("manual_add_button"), key="manual_add"):
                     if manual_path_def:
-                        current_paths = load_defined_paths()
+                        current_paths = load_defined_paths(active_profile)
                         if manual_path_def not in current_paths:
-                            current_paths.append(manual_path_def); save_defined_paths(sorted(list(set(current_paths))))
+                            current_paths.append(manual_path_def); save_defined_paths(sorted(list(set(current_paths))), active_profile)
                             st.success(t("success_path_added").format(path=manual_path_def)); st.rerun()
                         else: st.warning(t("warning_path_exists"))
                     else: st.warning(t("error_path_input_empty"))
+
     with col2:
         with st.container(border=True):
             st.subheader(t("edit_path_header"))
@@ -320,15 +397,15 @@ elif page == t("manage_view"):
                     recursive = st.checkbox(t("rename_recursive_checkbox"), value=True)
                     if st.button(t("rename_confirm_button"), use_container_width=True):
                         if new_path_name and new_path_name != path_to_edit:
-                            count = update_path_references(path_to_edit, new_path_name, recursive)
+                            count = update_path_references(active_profile, path_to_edit, new_path_name, recursive)
                             st.success(t("success_path_updated").format(count=count)); st.rerun()
                         else: st.warning(t("warning_path_not_changed"))
                 elif action == t("action_delete"):
                     st.warning(t("delete_warning").format(path=path_to_edit))
                     st.caption(t("delete_caption"))
                     if st.button(t("delete_confirm_button"), use_container_width=True, type="secondary"):
-                        current_paths = load_defined_paths()
+                        current_paths = load_defined_paths(active_profile)
                         if path_to_edit in current_paths:
-                            current_paths.remove(path_to_edit); save_defined_paths(current_paths)
+                            current_paths.remove(path_to_edit); save_defined_paths(current_paths, active_profile)
                             st.success(t("success_path_removed").format(path=path_to_edit)); st.rerun()
                         else: st.info(t("info_path_not_in_presets"))
