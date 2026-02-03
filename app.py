@@ -5,12 +5,16 @@ import pandas as pd
 from localization import LANGUAGES
 from collections import defaultdict
 
+# command to run the app:
+# streamlit run app.py
+
 # --- Internationalization ---
 if 'lang' not in st.session_state:
     st.session_state.lang = 'zh'
 
-def t(key):
-    return LANGUAGES[st.session_state.lang].get(key, key)
+def t(key, default=None):
+    fallback = default if default is not None else key
+    return LANGUAGES[st.session_state.lang].get(key, fallback)
 
 # --- UI Functions ---
 def get_font_css(language):
@@ -160,10 +164,35 @@ st.set_page_config(page_title=t("page_title"), layout="wide")
 st.markdown(get_font_css(st.session_state.lang), unsafe_allow_html=True)
 
 
+# Clear new profile input if flagged from a previous run
+if st.session_state.get("clear_new_profile_input"):
+    st.session_state.new_profile_name_input = ""
+    del st.session_state.clear_new_profile_input
+
 # --- Profile Initialization ---
 profiles = get_profiles()
-if 'active_profile' not in st.session_state or st.session_state.active_profile not in profiles:
-    st.session_state.active_profile = profiles[0] if profiles else "default"
+if not profiles: # Ensure there's at least a default profile
+    os.makedirs(os.path.join(DB_ROOT, "default"), exist_ok=True)
+    profiles = ["default"]
+
+# Check for a pending profile change from an action like add/delete
+if 'next_active_profile' in st.session_state:
+    # Use the pending profile and clear the flag
+    st.session_state.active_profile = st.session_state.next_active_profile
+    del st.session_state.next_active_profile
+
+# Initialize session state for the profile, prioritizing URL param only if session state is not set
+if 'active_profile' not in st.session_state:
+    query_profile = st.query_params.get("profile")
+    if query_profile and query_profile in profiles:
+        st.session_state.active_profile = query_profile
+    else:
+        st.session_state.active_profile = profiles[0]
+
+# Now, session state is the source of truth. The selectbox will update it.
+# We just need to ensure the URL is kept in sync with the session state.
+if st.query_params.get("profile") != st.session_state.active_profile:
+    st.query_params["profile"] = st.session_state.active_profile
 
 active_profile = st.session_state.active_profile
 all_data = load_data(active_profile)
@@ -204,8 +233,9 @@ with col1:
 
 with col2:
     with st.container(border=True):
-        cols = st.columns([0.5, 0.5])
-        with cols[0]:
+        l_col, p_col, add_col, del_col = st.columns([2, 5, 1, 1])
+
+        with l_col:
             lang_map = {'zh': '中文', 'en': 'English', 'ja': '日本語'}
             selected_lang_label = st.selectbox(
                 label=t("language"),
@@ -218,31 +248,55 @@ with col2:
                 st.session_state.lang = selected_lang_label
                 st.rerun()
 
-        with cols[1]:
-            with st.popover("🗃️ " + t("profile_management_header")):
-                st.selectbox(
-                    label=t("profile_selector_label"),
-                    options=profiles, # profiles is already defined from the initialization block
-                    key="active_profile"
-                )
-                st.markdown("---")
+        with p_col:
+            st.selectbox(
+                label=t("profile_selector_label"),
+                options=profiles,
+                key="active_profile",
+                label_visibility="collapsed"
+            )
+
+        with add_col:
+            with st.popover("➕", use_container_width=False):
                 st.subheader(t("add_profile_header"))
-                new_profile_name = st.text_input(t("new_profile_name_label"), placeholder=t("new_profile_name_placeholder"))
+                new_profile_name = st.text_input(t("new_profile_name_label"), placeholder=t("new_profile_name_placeholder"), key="new_profile_name_input")
                 if st.button(t("create_profile_button"), use_container_width=True):
                     if new_profile_name:
                         sanitized_name = new_profile_name.strip().replace("..", "").replace("/", "").replace("\\", "")
-                        if sanitized_name:
+                        if sanitized_name and sanitized_name != "default":
                             new_profile_path = get_profile_path(sanitized_name)
                             if not os.path.exists(new_profile_path):
                                 os.makedirs(new_profile_path)
+                                st.session_state.next_active_profile = sanitized_name
                                 st.success(t("profile_creation_success").format(name=sanitized_name))
+                                st.session_state.clear_new_profile_input = True
                                 st.rerun()
                             else:
                                 st.error(t("profile_creation_error_exists").format(name=sanitized_name))
                         else:
-                            st.warning(t("profile_creation_error_empty"))
+                            st.warning(t("profile_creation_error_empty_or_default", "Profile name cannot be empty or 'default'."))
                     else:
                         st.warning(t("profile_creation_error_empty"))
+        
+        with del_col:
+            with st.popover("➖", use_container_width=False):
+                st.subheader(t("delete_profile_header", "Delete Profile"))
+                profile_to_delete = st.session_state.active_profile
+                st.warning(t("delete_profile_warning", "This will permanently delete profile '{profile}'.").format(profile=profile_to_delete))
+                
+                if st.button(t("delete_confirm_button", "Confirm Deletion"), use_container_width=True, type="primary"):
+                    if profile_to_delete == "default":
+                        st.error(t("cannot_delete_default_profile_error", "The 'default' profile cannot be deleted."))
+                    else:
+                        import shutil
+                        st.session_state.next_active_profile = "default"
+                        profile_path = get_profile_path(profile_to_delete)
+                        try:
+                            shutil.rmtree(profile_path)
+                            st.success(t("profile_deleted_success", "Profile '{profile}' deleted.").format(profile=profile_to_delete))
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error deleting profile: {e}")
 
 # Get the page value for the main logic
 page = st.session_state.page
@@ -360,7 +414,14 @@ elif page == t("manage_view"):
         with st.container(border=True):
             st.subheader(t("add_path_header"))
             parent_options = [t("parent_top_level")] + all_paths
-            selected_parent = st.selectbox(t("select_parent_step1"), parent_options, help=t("select_parent_help"))
+            
+            # Remember last selected parent
+            default_parent_index = 0
+            if 'remembered_parent' in st.session_state and st.session_state.remembered_parent in parent_options:
+                default_parent_index = parent_options.index(st.session_state.remembered_parent)
+
+            selected_parent = st.selectbox(t("select_parent_step1"), parent_options, index=default_parent_index, help=t("select_parent_help"))
+            
             new_part = st.text_input(t("add_child_step2"), placeholder=t("add_child_placeholder"))
             if st.button(t("add_node_button"), type="primary", use_container_width=True):
                 if new_part:
@@ -371,7 +432,9 @@ elif page == t("manage_view"):
                         current_paths = load_defined_paths(active_profile)
                         if new_path_def not in current_paths:
                             current_paths.append(new_path_def); save_defined_paths(sorted(list(set(current_paths))), active_profile)
-                            st.success(t("success_path_added").format(path=new_path_def)); st.rerun()
+                            st.success(t("success_path_added").format(path=new_path_def))
+                            st.session_state.remembered_parent = selected_parent # Remember for next time
+                            st.rerun()
                         else: st.warning(t("warning_path_exists"))
                 else: st.warning(t("error_path_input_empty"))
             with st.expander(t("manual_path_expander")):
