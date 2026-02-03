@@ -8,8 +8,6 @@ from collections import defaultdict
 # command to run the app:
 # streamlit run app.py
 
-# command to run the app:
-# streamlit run app.py
 
 # --- Internationalization ---
 if 'lang' not in st.session_state:
@@ -60,7 +58,7 @@ def is_valid_profilename(name):
     if not name or name.isspace():
         return False, "Profile name cannot be empty."
     # Prohibit characters that are invalid in Windows/Linux filenames
-    if any(char in '\\/:*?"<>|' for char in name):
+    if any(char in r'\/:*?"<>|' for char in name):
         return False, "Profile name contains invalid characters (e.g., \\ / : * ? \" < > |)."
     if name in [".", ".."]:
         return False, "Profile name cannot be '.' or '..'."
@@ -111,13 +109,6 @@ def get_profiles():
             profile_name = f[len(PROFILE_PREFIX):-len(PROFILE_SUFFIX)]
             if profile_name:
                 profiles.append(profile_name)
-
-    if "default" not in profiles:
-        default_path = get_profile_file_path("default")
-        if not os.path.exists(default_path):
-            with open(default_path, 'w', encoding='utf-8') as f:
-                json.dump({"skills": [], "paths": []}, f)
-        profiles.append("default")
         
     return sorted(profiles)
 
@@ -161,7 +152,6 @@ def save_data_and_clear_cache(data, profile):
 
 def save_defined_paths_and_clear_cache(paths, profile):
     save_defined_paths(paths, profile)
-    _load_defined_paths.clear()
 
 @st.cache_data
 def _calculate_urgency(skills_tuple):
@@ -203,7 +193,7 @@ def generate_tree_dot(skills, all_paths, show_leaves=True):
             if parts:
                 parent = parts[-1]
 
-            name = s['name'].replace('"', '\"')
+            name = s['name'].replace('"', '"')
             prof = int(s.get('proficiency', 0))
             prio = int(s.get('priority', 0))
             display_name = f"{name} {'*' * prio}"
@@ -288,6 +278,10 @@ st.markdown("""
     div[data-testid="stHorizontalBlock"]:has(div[data-testid="stSelectbox"]) > div > div[data-testid="stVerticalBlock"] {
         flex-grow: 1;
     }
+    /* Hide the tooltip on sliders to avoid visual clutter */
+    div[data-testid="stTooltip"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -308,24 +302,31 @@ if 'next_active_profile' in st.session_state:
     st.session_state.active_profile = st.session_state.next_active_profile
     del st.session_state.next_active_profile
 
-# Initialize session state for the profile, prioritizing URL param only if session state is not set
-if 'active_profile' not in st.session_state:
+# If the current active profile is invalid (e.g., deleted), or no profile is set, pick one.
+if st.session_state.get('active_profile') not in profiles:
+    # Try to get from URL param
     query_profile = st.query_params.get("profile")
     if query_profile and query_profile in profiles:
         st.session_state.active_profile = query_profile
     else:
-        st.session_state.active_profile = profiles[0]
+        # Otherwise, pick the first available, or None if no profiles exist
+        st.session_state.active_profile = profiles[0] if profiles else None
 
-# Now, session state is the source of truth. The selectbox will update it.
+# Now, session state is the source of truth.
+active_profile = st.session_state.get('active_profile')
+
 # We just need to ensure the URL is kept in sync with the session state.
-if st.query_params.get("profile") != st.session_state.active_profile:
-    st.query_params["profile"] = st.session_state.active_profile
+if active_profile and st.query_params.get("profile") != active_profile:
+    st.query_params["profile"] = active_profile
 
-active_profile = st.session_state.active_profile
+# If there are no profiles, stop and prompt user to create one.
+if not active_profile:
+    st.info("To get started, please create a new profile using the '➕' button in the header.")
+    st.stop() # Stop execution so the rest of the app doesn't try to load data for a null profile.
 all_data = load_data(active_profile)
 defined_paths = load_defined_paths(active_profile)
 existing_skill_paths = [d.get('path', '') for d in all_data if d.get('path')]
-all_paths = list(dict.fromkeys(existing_skill_paths + defined_paths))
+all_paths = sorted(list(dict.fromkeys(existing_skill_paths + defined_paths)))
 
 
     
@@ -345,7 +346,7 @@ with col1:
             st.button(
                 t("home_view"), 
                 on_click=set_page, 
-                args=("home_view",), 
+                args=("home_view",),
                 use_container_width=True, 
                 type="primary" if st.session_state.page == "home_view" else "secondary"
             )
@@ -353,7 +354,7 @@ with col1:
             st.button(
                 t("manage_view"), 
                 on_click=set_page, 
-                args=("manage_view",), 
+                args=("manage_view",),
                 use_container_width=True, 
                 type="primary" if st.session_state.page == "manage_view" else "secondary"
             )
@@ -392,7 +393,7 @@ with col2:
                     if new_profile_name:
                         sanitized_name = new_profile_name.strip()
                         is_valid, error_msg = is_valid_profilename(sanitized_name)
-                        if is_valid and sanitized_name != "default":
+                        if is_valid:
                             new_profile_file = get_profile_file_path(sanitized_name)
                             if not os.path.exists(new_profile_file):
                                 with open(new_profile_file, 'w', encoding='utf-8') as f:
@@ -400,12 +401,11 @@ with col2:
                                 st.session_state.next_active_profile = sanitized_name
                                 st.success(t("profile_creation_success").format(name=sanitized_name))
                                 st.session_state.clear_new_profile_input = True
-                                st.session_state.clear_new_profile_input = True
                                 st.rerun()
                             else:
                                 st.error(t("profile_creation_error_exists").format(name=sanitized_name))
                         else:
-                            st.warning(error_msg if not is_valid else t("profile_creation_error_empty_or_default", "Profile name cannot be empty or 'default'."))
+                            st.warning(error_msg)
                     else:
                         st.warning(t("profile_creation_error_empty"))
 
@@ -442,46 +442,41 @@ with col2:
                 st.subheader(t("rename_profile_header", "Rename Profile"))
                 profile_to_rename = st.session_state.active_profile
                 
-                if profile_to_rename == "default":
-                    st.info(t("cannot_rename_default", "The 'default' profile cannot be renamed."))
-                else:
-                    new_profile_name_rename = st.text_input(t("new_profile_name_label", "New profile name"), value=profile_to_rename, key="new_profile_name_rename_input")
-                    if st.button(f'✏️ {t("rename_profile_button", "Rename")}', use_container_width=True):
-                        sanitized_new_name = new_profile_name_rename.strip()
-                        is_valid, error_msg = is_valid_profilename(sanitized_new_name)
+                new_profile_name_rename = st.text_input(t("new_profile_name_label", "New profile name"), value=profile_to_rename, key="new_profile_name_rename_input")
+                if st.button(f'✏️ {t("rename_profile_button", "Rename")}', use_container_width=True):
+                    sanitized_new_name = new_profile_name_rename.strip()
+                    is_valid, error_msg = is_valid_profilename(sanitized_new_name)
 
-                        if not is_valid:
-                            st.error(error_msg)
-                        elif sanitized_new_name == profile_to_rename:
-                            st.warning(t("profile_name_not_changed", "The new name is the same as the old one."))
-                        elif os.path.exists(get_profile_file_path(sanitized_new_name)):
-                            st.error(t("profile_creation_error_exists").format(name=sanitized_new_name))
-                        else:
-                            try:
-                                os.rename(get_profile_file_path(profile_to_rename), get_profile_file_path(sanitized_new_name))
-                                st.session_state.next_active_profile = sanitized_new_name
-                                st.success(t("profile_rename_success", "Profile renamed from '{old}' to '{new}'.").format(old=profile_to_rename, new=sanitized_new_name))
-                                st.rerun()
-                            except Exception as e:
-                                st.error(f"Error renaming profile: {e}")
+                    if not is_valid:
+                        st.error(error_msg)
+                    elif sanitized_new_name == profile_to_rename:
+                        st.warning(t("profile_name_not_changed", "The new name is the same as the old one."))
+                    elif os.path.exists(get_profile_file_path(sanitized_new_name)):
+                        st.error(t("profile_creation_error_exists").format(name=sanitized_new_name))
+                    else:
+                        try:
+                            os.rename(get_profile_file_path(profile_to_rename), get_profile_file_path(sanitized_new_name))
+                            st.session_state.next_active_profile = sanitized_new_name
+                            st.success(t("profile_rename_success", "Profile renamed from '{old}' to '{new}'.").format(old=profile_to_rename, new=sanitized_new_name))
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error renaming profile: {e}")
 
                 st.markdown("---")
                 st.subheader(t("delete_profile_header", "Delete Profile"))
                 profile_to_delete = st.session_state.active_profile
-                st.warning(t("delete_profile_warning", "This will permanently delete profile '{profile}'.").format(profile=profile_to_delete))
+                st.warning(t("delete_profile_warning", "This will permanently delete profile '{profile}'").format(profile=profile_to_delete))
                 
                 if st.button(f'🗑️ {t("delete_confirm_button", "Confirm Deletion")}', use_container_width=True, type="primary"):
-                    if profile_to_delete == "default":
-                        st.error(t("cannot_delete_default_profile_error", "The 'default' profile cannot be deleted."))
-                    else:
-                        st.session_state.next_active_profile = "default"
-                        profile_path = get_profile_file_path(profile_to_delete)
-                        try:
-                            os.remove(profile_path)
-                            st.success(t("profile_deleted_success", "Profile '{profile}' deleted.").format(profile=profile_to_delete))
-                            st.rerun()
-                        except Exception as e:
-                            st.error(f"Error deleting profile: {e}")
+                    remaining_profiles = [p for p in profiles if p != profile_to_delete]
+                    st.session_state.next_active_profile = remaining_profiles[0] if remaining_profiles else None
+                    profile_path = get_profile_file_path(profile_to_delete)
+                    try:
+                        os.remove(profile_path)
+                        st.success(t("profile_deleted_success", "Profile '{profile}' deleted.").format(profile=profile_to_delete))
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Error deleting profile: {e}")
 
 # Get the page value for the main logic
 page = st.session_state.page
@@ -548,13 +543,23 @@ if page == "home_view":
         with st.container(border=True):
             st.markdown(f"##### {t('details_box_title')}")
             name = st.text_input(t("skill_name_label"), placeholder=t("skill_name_placeholder"), key="input_name")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.write(t("proficiency_label"))
-                proficiency = st.radio("proficiency_radio", options=[5, 4, 3, 2, 1, 0], index=2, label_visibility="collapsed")
-            with col2:
-                st.write(t("priority_label"))
-                priority = st.radio("priority_radio", options=[3, 2, 1], index=1, label_visibility="collapsed")
+            st.write(t("proficiency_label"))
+            p_col1, p_col2, p_col3 = st.columns([1, 10, 1])
+            with p_col1:
+                st.write("0")
+            with p_col2:
+                proficiency = st.slider("proficiency_slider", min_value=0, max_value=5, value=3, label_visibility="collapsed")
+            with p_col3:
+                st.write("5")
+
+            st.write(t("priority_label"))
+            pr_col1, pr_col2, pr_col3 = st.columns([1, 10, 1])
+            with pr_col1:
+                st.write("1")
+            with pr_col2:
+                priority = st.slider("priority_slider", min_value=1, max_value=3, value=2, label_visibility="collapsed")
+            with pr_col3:
+                st.write("3")
             memo = st.text_area(t("memo_label"), placeholder=t("memo_placeholder"), height=68, key="input_memo")
         if st.button(t("submit_button"), type="primary", use_container_width=True):
             if name and selected_path:
@@ -790,7 +795,7 @@ elif page == "manage_view":
             if not all_paths: st.warning(t("info_path_not_in_presets"))
             else:
                 path_to_edit = st.selectbox(t("select_path_to_edit"), all_paths, key="path_to_edit_selectbox")
-                action = st.radio(t("action_type_label"), [t("action_rename"), t("action_delete"), t("action_order")], horizontal=True, key="action_radio")
+                action = st.radio(t("action_type_label"), [t("action_rename"), t("action_delete")], horizontal=True, key="action_radio")
                 if action == t("action_rename"):
                     new_path_name = st.text_input(t("rename_to_label"), value=path_to_edit)
                     recursive = st.checkbox(t("rename_recursive_checkbox"), value=True)
@@ -808,26 +813,3 @@ elif page == "manage_view":
                             current_paths.remove(path_to_edit); save_defined_paths_and_clear_cache(current_paths, active_profile)
                             st.success(t("success_path_removed").format(path=path_to_edit)); st.rerun()
                         else: st.info(t("info_path_not_in_presets"))
-                elif action == t("action_order"):
-                    st.write("---")
-                    st.subheader(t("action_order"))
-                    
-                    paths_to_order = all_paths.copy()
-
-                    for i, path in enumerate(paths_to_order):
-                        cols = st.columns([0.8, 0.1, 0.1])
-                        with cols[0]:
-                            st.write(path)
-                        with cols[1]:
-                            if i > 0:
-                                if st.button(t("action_move_up"), key=f"up_{path}"):
-                                    paths_to_order.insert(i - 1, paths_to_order.pop(i))
-                                    save_defined_paths_and_clear_cache(paths_to_order, active_profile)
-                                    st.rerun()
-                        with cols[2]:
-                            if i < len(paths_to_order) - 1:
-                                if st.button(t("action_move_down"), key=f"down_{path}"):
-                                    paths_to_order.insert(i + 1, paths_to_order.pop(i))
-                                    save_defined_paths_and_clear_cache(paths_to_order, active_profile)
-                                    st.rerun()
-
