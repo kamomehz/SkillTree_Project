@@ -8,10 +8,16 @@ from collections import defaultdict
 # command to run the app:
 # streamlit run app.py
 
+# command to run the app:
+# streamlit run app.py
+
 # --- Internationalization ---
 if 'lang' not in st.session_state:
     st.session_state.lang = 'zh'
 
+def t(key, default=None):
+    fallback = default if default is not None else key
+    return LANGUAGES[st.session_state.lang].get(key, fallback)
 def t(key, default=None):
     fallback = default if default is not None else key
     return LANGUAGES[st.session_state.lang].get(key, fallback)
@@ -393,6 +399,7 @@ with col2:
                                     json.dump({"skills": [], "paths": []}, f, indent=4, ensure_ascii=False)
                                 st.session_state.next_active_profile = sanitized_name
                                 st.success(t("profile_creation_success").format(name=sanitized_name))
+                                st.session_state.clear_new_profile_input = True
                                 st.session_state.clear_new_profile_input = True
                                 st.rerun()
                             else:
