@@ -468,15 +468,18 @@ with col2:
                 st.warning(t("delete_profile_warning", "This will permanently delete profile '{profile}'").format(profile=profile_to_delete))
                 
                 if st.button(f'🗑️ {t("delete_confirm_button", "Confirm Deletion")}', use_container_width=True, type="primary"):
-                    remaining_profiles = [p for p in profiles if p != profile_to_delete]
-                    st.session_state.next_active_profile = remaining_profiles[0] if remaining_profiles else None
-                    profile_path = get_profile_file_path(profile_to_delete)
-                    try:
-                        os.remove(profile_path)
-                        st.success(t("profile_deleted_success", "Profile '{profile}' deleted.").format(profile=profile_to_delete))
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Error deleting profile: {e}")
+                    if len(profiles) > 1:
+                        remaining_profiles = [p for p in profiles if p != profile_to_delete]
+                        st.session_state.next_active_profile = remaining_profiles[0] if remaining_profiles else None
+                        profile_path = get_profile_file_path(profile_to_delete)
+                        try:
+                            os.remove(profile_path)
+                            st.success(t("profile_deleted_success", "Profile '{profile}' deleted.").format(profile=profile_to_delete))
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Error deleting profile: {e}")
+                    else:
+                        st.error(t("cannot_delete_last_profile", "Cannot delete the last profile."))
 
 # Get the page value for the main logic
 page = st.session_state.page
@@ -485,91 +488,81 @@ with st.sidebar:
     st.title(t("nav_title"))
     st.markdown("---")
 
+    if st.session_state.get("submit_success", False):
+        st.session_state.input_name, st.session_state.input_memo, st.session_state.submit_success = "", "", False
+        if 'cascading_path_selection' in st.session_state:
+            st.session_state.cascading_path_selection = []
+    
+    st.header(t("add_skill_header"))
+    with st.container(border=True):
+        st.markdown(f"##### {t('path_box_title')}")
+        
+        path_tree = build_path_tree(all_paths)
+        if 'cascading_path_selection' not in st.session_state:
+            st.session_state.cascading_path_selection = []
+
+        current_parts = st.session_state.cascading_path_selection
+        
+        current_subtree = path_tree
+        new_parts = []
+        level = 0
+        final_path = ""
+
+        while True:
+            options = list(current_subtree.keys())
+            if not options:
+                final_path = ".".join(new_parts)
+                break
+
+            default_index = 0
+            if level < len(current_parts) and current_parts[level] in options:
+                default_index = options.index(current_parts[level]) + 1
+
+            selection = st.selectbox(
+                label=f"{t('level', default='Level')} {level + 1}",
+                options=[''] + options,
+                index=default_index,
+                key=f"path_select_{level}"
+            )
+
+            if selection:
+                new_parts.append(selection)
+                current_subtree = current_subtree.get(selection, {})
+                level += 1
+            else:
+                final_path = ".".join(new_parts)
+                break
+        
+        if new_parts != st.session_state.cascading_path_selection:
+            st.session_state.cascading_path_selection = new_parts
+            st.rerun()
+
+        selected_path = final_path
+        st.caption(t("path_to_be_added_to").format(path=selected_path) if selected_path else t("path_prompt"))
+    with st.container(border=True):
+        st.markdown(f"##### {t('details_box_title')}")
+        name = st.text_input(t("skill_name_label"), placeholder=t("skill_name_placeholder"), key="input_name")
+        
+        st.write(t("proficiency_label"))
+        proficiency = st.slider("proficiency_slider", min_value=0, max_value=5, value=3, label_visibility="collapsed")
+
+        st.write(t("priority_label"))
+        priority = st.slider("priority_slider", min_value=1, max_value=3, value=2, label_visibility="collapsed")
+        
+        memo = st.text_area(t("memo_label"), placeholder=t("memo_placeholder"), height=68, key="input_memo")
+    if st.button(t("submit_button"), type="primary", use_container_width=True):
+        if name and selected_path:
+            current_data = all_data.copy()
+            current_data.append({"name": name, "path": selected_path, "proficiency": proficiency, "priority": priority, "memo": memo})
+            save_data_and_clear_cache(current_data, active_profile)
+            st.success(t("success_skill_added").format(name=name))
+            st.session_state.submit_success = True
+            st.rerun()
+        else: st.error(t("error_skill_name_empty") if not name else t("error_path_empty"))
+
 if page == "home_view":
     st.title(t("main_title"))
     st.markdown("---")
-    with st.sidebar:
-        if st.session_state.get("submit_success", False):
-            st.session_state.input_name, st.session_state.input_memo, st.session_state.submit_success = "", "", False
-            if 'cascading_path_selection' in st.session_state:
-                st.session_state.cascading_path_selection = []
-        
-        st.header(t("add_skill_header"))
-        with st.container(border=True):
-            st.markdown(f"##### {t('path_box_title')}")
-            
-            path_tree = build_path_tree(all_paths)
-            if 'cascading_path_selection' not in st.session_state:
-                st.session_state.cascading_path_selection = []
-
-            current_parts = st.session_state.cascading_path_selection
-            
-            current_subtree = path_tree
-            new_parts = []
-            level = 0
-            final_path = ""
-
-            while True:
-                options = list(current_subtree.keys())
-                if not options:
-                    final_path = ".".join(new_parts)
-                    break
-
-                default_index = 0
-                if level < len(current_parts) and current_parts[level] in options:
-                    default_index = options.index(current_parts[level]) + 1
-
-                selection = st.selectbox(
-                    label=f"{t('level', default='Level')} {level + 1}",
-                    options=[''] + options,
-                    index=default_index,
-                    key=f"path_select_{level}"
-                )
-
-                if selection:
-                    new_parts.append(selection)
-                    current_subtree = current_subtree.get(selection, {})
-                    level += 1
-                else:
-                    final_path = ".".join(new_parts)
-                    break
-            
-            if new_parts != st.session_state.cascading_path_selection:
-                st.session_state.cascading_path_selection = new_parts
-                st.rerun()
-
-            selected_path = final_path
-            st.caption(t("path_to_be_added_to").format(path=selected_path) if selected_path else t("path_prompt"))
-        with st.container(border=True):
-            st.markdown(f"##### {t('details_box_title')}")
-            name = st.text_input(t("skill_name_label"), placeholder=t("skill_name_placeholder"), key="input_name")
-            st.write(t("proficiency_label"))
-            p_col1, p_col2, p_col3 = st.columns([1, 10, 1])
-            with p_col1:
-                st.write("0")
-            with p_col2:
-                proficiency = st.slider("proficiency_slider", min_value=0, max_value=5, value=3, label_visibility="collapsed")
-            with p_col3:
-                st.write("5")
-
-            st.write(t("priority_label"))
-            pr_col1, pr_col2, pr_col3 = st.columns([1, 10, 1])
-            with pr_col1:
-                st.write("1")
-            with pr_col2:
-                priority = st.slider("priority_slider", min_value=1, max_value=3, value=2, label_visibility="collapsed")
-            with pr_col3:
-                st.write("3")
-            memo = st.text_area(t("memo_label"), placeholder=t("memo_placeholder"), height=68, key="input_memo")
-        if st.button(t("submit_button"), type="primary", use_container_width=True):
-            if name and selected_path:
-                current_data = all_data.copy()
-                current_data.append({"name": name, "path": selected_path, "proficiency": proficiency, "priority": priority, "memo": memo})
-                save_data_and_clear_cache(current_data, active_profile)
-                st.success(t("success_skill_added").format(name=name))
-                st.session_state.submit_success = True
-                st.rerun()
-            else: st.error(t("error_skill_name_empty") if not name else t("error_path_empty"))
 
     raw_skills = load_data(active_profile)
     filtered_data = raw_skills
@@ -592,19 +585,20 @@ if page == "home_view":
             df_display = df[['path', 'name', 'proficiency', 'priority', 'urgency_score', 'memo']].rename(columns={'name': t('col_name'), 'path': t('col_path'), 'proficiency': t('col_proficiency'), 'priority': t('col_priority'), 'urgency_score': t('col_urgency'), 'memo': t('col_memo')})
             df_display = df_display.reset_index(drop=True)
 
+            table_width_ratio=[0.2, 0.2, 0.07, 0.07, 0.07, 0.14, 0.07, 0.05, 0.05, 0.05]
             # Header
-            header_cols = st.columns([0.2, 0.2, 0.1, 0.1, 0.1, 0.15, 0.15, 0.05, 0.05])
+            header_cols = st.columns(table_width_ratio)
             header_cols[0].markdown(f"**{t('col_path')}**")
             header_cols[1].markdown(f"**{t('col_name')}**")
             header_cols[2].markdown(f"**{t('col_proficiency')}**")
             header_cols[3].markdown(f"**{t('col_priority')}**")
             header_cols[4].markdown(f"**{t('col_urgency')}**")
             header_cols[5].markdown(f"**{t('col_memo')}**")
-            header_cols[6].markdown(f"**{t('edit_mode_toggle')}**")
+            header_cols[6].markdown(f"**{t('edit_column_header', '编辑')}**")
 
 
             for i, row in df_display.iterrows():
-                cols = st.columns([0.2, 0.2, 0.1, 0.1, 0.1, 0.15, 0.15, 0.05, 0.05])
+                cols = st.columns(table_width_ratio)
                 with cols[0]:
                     st.write(row[t('col_path')])
                 with cols[1]:
@@ -620,7 +614,7 @@ if page == "home_view":
                 with cols[5]:
                     st.write(row[t('col_memo')])
                 with cols[6]:
-                    with st.popover(t("edit_mode_toggle"), use_container_width=True):
+                    with st.popover("✏️", use_container_width=True):
                         st.subheader(t("edit_skill_header"))
                         
                         edited_name = st.text_input(t("skill_name_label"), value=row[t('col_name')], key=f"name_{i}")
@@ -657,7 +651,24 @@ if page == "home_view":
                             else:
                                 st.error("Could not find the skill to update.")
                 with cols[7]:
-                    if st.button(t("action_move_up"), key=f"up_{i}"):
+                    if st.button("🗑️", key=f"del_{i}"):
+                        current_data = all_data.copy()
+                        path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
+                        skill_to_delete_index = -1
+                        for idx, skill in enumerate(current_data):
+                            if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
+                                skill_to_delete_index = idx
+                                break
+                        
+                        if skill_to_delete_index != -1:
+                            current_data.pop(skill_to_delete_index)
+                            save_data_and_clear_cache(current_data, active_profile)
+                            st.success(t("skill_deleted_success", "Skill has been deleted."))
+                            st.rerun()
+                        else:
+                            st.error("Error: Could not find the skill to delete.")
+                with cols[8]:
+                    if st.button("⬆️", key=f"up_{i}"):
                         current_data = all_data.copy()
                         original_skill_index = -1
                         path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
@@ -670,8 +681,8 @@ if page == "home_view":
                             save_data_and_clear_cache(current_data, active_profile)
                             st.rerun()
 
-                with cols[8]:
-                    if st.button(t("action_move_down"), key=f"down_{i}"):
+                with cols[9]:
+                    if st.button("⬇️", key=f"down_{i}"):
                         current_data = all_data.copy()
                         original_skill_index = -1
                         path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
@@ -679,7 +690,7 @@ if page == "home_view":
                             if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
                                 original_skill_index = idx
                                 break
-                        if original_skill_index < len(current_data) - 1:
+                        if original_skill_index < len(current_data) - 1 and original_skill_index != -1:
                             current_data.insert(original_skill_index + 1, current_data.pop(original_skill_index))
                             save_data_and_clear_cache(current_data, active_profile)
                             st.rerun()

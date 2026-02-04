@@ -1,13 +1,6 @@
 {
     "skills": [
         {
-            "name": "LSTM",
-            "path": "专业理论知识.人工智能.初期语言模型",
-            "proficiency": 1,
-            "priority": 1,
-            "memo": ""
-        },
-        {
             "name": "RNN",
             "path": "专业理论知识.人工智能.初期语言模型",
             "proficiency": 1,
