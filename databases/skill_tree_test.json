@@ -8,6 +8,13 @@
             "memo": ""
         },
         {
+            "name": "LSTM",
+            "path": "专业理论知识.人工智能.初期语言模型",
+            "proficiency": 1,
+            "priority": 1,
+            "memo": ""
+        },
+        {
             "name": "ew",
             "path": "专业理论知识",
             "proficiency": 3,

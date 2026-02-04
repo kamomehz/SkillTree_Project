@@ -55,6 +55,9 @@ LANGUAGES = {
         "col_priority": "优先级",
         "col_urgency": "紧迫度",
         "col_memo": "备注/证明",
+        "col_edit": "编辑",
+        "col_delete": "删除",
+        "col_move": "移动",
         
         "edit_mode_toggle": "✏️ 编辑模式",
         "save_changes_button": "💾 保存表格修改",
@@ -165,6 +168,9 @@ LANGUAGES = {
         "col_priority": "Priority",
         "col_urgency": "Urgency",
         "col_memo": "Memo/Proof",
+        "col_edit": "Edit",
+        "col_delete": "Delete",
+        "col_move": "Move",
         "edit_mode_toggle": "✏️ Edit Mode",
         "save_changes_button": "💾 Save Table Changes",
         "tree_legend": "Legend: ⬜ Unfamiliar(0) | 🟥 Beginner(1) | 🟨 Familiar(2-3) | 🟩 Proficient(4-5) | ⭐ Stars for Priority",
@@ -228,7 +234,12 @@ LANGUAGES = {
         "export_button": "Export",
         "import_success": "✅ Data imported successfully!",
         "import_error": "❌ Import failed: Invalid JSON file.",
-        "export_label": "Download your skill tree"
+        "export_label": "Download your skill tree",
+        "existing_path": "Existing Path",
+        "add_to_top_level": "Add as top-level category",
+        "import_export_profile_header": "Import / Export Profile",
+        "import_submit_button": "Import & Overwrite",
+        "level": "Level"
     },
     "ja": {
         "page_title": "個人スキルツリー",
@@ -272,6 +283,9 @@ LANGUAGES = {
         "col_priority": "優先度",
         "col_urgency": "緊急度",
         "col_memo": "メモ/証明",
+        "col_edit": "編集",
+        "col_delete": "削除",
+        "col_move": "移動",
         "edit_mode_toggle": "✏️ 編集モード",
         "save_changes_button": "💾 テーブルの変更を保存",
         "tree_legend": "凡例: ⬜ 未習熟(0) | 🟥 初心者(1) | 🟨 習熟(2-3) | 🟩 精通(4-5) | ⭐ 星は優先度",
@@ -335,6 +349,11 @@ LANGUAGES = {
         "export_button": "エクスポート",
         "import_success": "✅ データが正常にインポートされました！",
         "import_error": "❌ インポートに失敗しました：無効なJSONファイルです。",
-        "export_label": "スキルツリーをダウンロード"
+        "export_label": "スキルツリーをダウンロード",
+        "existing_path": "既存パス",
+        "add_to_top_level": "トップレベルカテゴリとして追加",
+        "import_export_profile_header": "プロファイルのインポート/エクスポート",
+        "import_submit_button": "インポートして上書き",
+        "level": "レベル"
     }
 }

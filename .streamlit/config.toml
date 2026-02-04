@@ -1,0 +1,6 @@
+[theme]
+primaryColor = "#FF6B6B"
+backgroundColor = "#F8F9FA"
+
+[logger]
+level = "warning"

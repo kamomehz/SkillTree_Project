@@ -16,9 +16,6 @@ if 'lang' not in st.session_state:
 def t(key, default=None):
     fallback = default if default is not None else key
     return LANGUAGES[st.session_state.lang].get(key, fallback)
-def t(key, default=None):
-    fallback = default if default is not None else key
-    return LANGUAGES[st.session_state.lang].get(key, fallback)
 
 # --- UI Functions ---
 def get_font_css(language):
@@ -47,6 +44,7 @@ def color_box(value, color):
         {value}
     </div>
     """
+
 
 # --- Data Logic ---
 DB_ROOT = "databases"
@@ -165,6 +163,14 @@ def _calculate_urgency(skills_tuple):
 def calculate_urgency(skills):
     return _calculate_urgency(tuple(frozenset(s.items()) for s in skills))
 
+# 查找技能的循环逻辑
+def find_skill_index(data, skill_name, path_str):
+    """查找技能在列表中的索引"""
+    for idx, skill in enumerate(data):
+        if skill['name'] == skill_name and skill.get('path', '') == path_str:
+            return idx
+    return -1
+
 def generate_tree_dot(skills, all_paths, show_leaves=True):
     """生成 Graphviz DOT 格式的树状图数据，并对齐层级"""
     dot = ['digraph G {']
@@ -186,14 +192,14 @@ def generate_tree_dot(skills, all_paths, show_leaves=True):
             parent = part
             
     if show_leaves:
-        for s in skills:
+         for skill_idx, s in enumerate(skills):
             path = s.get('path', '')
             parts = [p.strip() for p in path.split('.') if p.strip()]
             parent = root_node_label
             if parts:
                 parent = parts[-1]
-
-            name = s['name'].replace('"', '"')
+                
+            name = s['name'].replace('\\', '\\\\').replace('"', '\\"').replace('\n', ' ')    
             prof = int(s.get('proficiency', 0))
             prio = int(s.get('priority', 0))
             display_name = f"{name} {'*' * prio}"
@@ -202,8 +208,10 @@ def generate_tree_dot(skills, all_paths, show_leaves=True):
             elif prof == 1: color = "#ffcccc"
             elif prof <= 3: color = "#fff4cc"
             else: color = "#ccffcc"
-            
-            leaf_id = f"skill_{s['name']}_{s.get('path','')}"
+
+            # 改进方案 - 使用索引确保唯一性
+            leaf_id = f"skill_{skill_idx}_{hash(s['name'] + s.get('path','')) % 100000}"
+            # leaf_id = f"skill_{s['name']}_{s.get('path','')}"
             dot.append(f'  "{leaf_id}" [label="{display_name}", shape=note, fillcolor="{color}"];')
             edges.add(f'"{parent}" -> "{leaf_id}"')
             levels[len(parts) + 1].add(f'"{leaf_id}"')
@@ -250,7 +258,10 @@ def update_defined_paths(profile, old_path, new_path, recursive=True):
         if p == old_path: new_paths.append(new_path); changed = True
         elif recursive and p.startswith(old_path + '.'): new_paths.append(new_path + p[len(old_path):]); changed = True
         else: new_paths.append(p)
-    if changed: save_defined_paths_and_clear_cache(list(set(new_paths)), profile)
+    if changed: 
+        # ❌ 原来：list(set(new_paths))  # 会破坏顺序
+        # ✅ 改为：list(dict.fromkeys(new_paths))  # 去重同时保持顺序
+        save_defined_paths_and_clear_cache(list(dict.fromkeys(new_paths)), profile)
 
 def update_path_references(profile, old_path, new_path, recursive=True):
     updated_count = update_skill_paths(profile, old_path, new_path, recursive)
@@ -281,6 +292,12 @@ st.markdown("""
     /* Hide the tooltip on sliders to avoid visual clutter */
     div[data-testid="stTooltip"] {
         display: none !important;
+    }
+    /* 为行添加下边框 */
+    [data-testid="stHorizontalBlock"] {
+        border-bottom: 2px solid rgba(200, 200, 200, 0.2);
+        padding-bottom: 12px;
+        margin-bottom: 12px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -579,13 +596,13 @@ if page == "home_view":
         st.subheader(t("panorama_header"))
         tab2, tab1 = st.tabs([t("tab_tree"), t("tab_list")])
         with tab1:
-            df = pd.DataFrame(skills).sort_values(by=['path', 'urgency_score'], ascending=[True, False])
-            if 'memo' not in df.columns: df['memo'] = ""
-            df['path'] = df['path'].astype(str).str.replace('.', ' ➤ ', regex=False)
-            df_display = df[['path', 'name', 'proficiency', 'priority', 'urgency_score', 'memo']].rename(columns={'name': t('col_name'), 'path': t('col_path'), 'proficiency': t('col_proficiency'), 'priority': t('col_priority'), 'urgency_score': t('col_urgency'), 'memo': t('col_memo')})
-            df_display = df_display.reset_index(drop=True)
-
-            table_width_ratio=[0.2, 0.2, 0.07, 0.07, 0.07, 0.14, 0.07, 0.05, 0.05, 0.05]
+            # ✅ 直接创建排序列表（显示用），建立索引映射
+            sorted_display = sorted(enumerate(all_data), 
+                                  key=lambda x: (x[1].get('path', ''), 
+                                               next((s['urgency_score'] for s in skills if s['name'] == x[1]['name']), 0)),
+                                  reverse=[False, True])
+            
+            table_width_ratio = [0.20, 0.20, 0.08, 0.07, 0.07, 0.16, 0.07, 0.05, 0.05, 0.05]
             # Header
             header_cols = st.columns(table_width_ratio)
             header_cols[0].markdown(f"**{t('col_path')}**")
@@ -594,51 +611,60 @@ if page == "home_view":
             header_cols[3].markdown(f"**{t('col_priority')}**")
             header_cols[4].markdown(f"**{t('col_urgency')}**")
             header_cols[5].markdown(f"**{t('col_memo')}**")
-            header_cols[6].markdown(f"**{t('edit_column_header', '编辑')}**")
+            header_cols[6].markdown(f"**{t('col_edit')}**")
+            header_cols[7].markdown(f"**{t('col_delete')}**")
+            header_cols[8].markdown(f"**{t('col_move')}**")
 
-
-            for i, row in df_display.iterrows():
+            # 直接遍历 all_data，按排序顺序显示
+            for original_idx, skill in sorted_display:
+                display_path = skill.get('path', '').replace('.', ' ➤ ')
+                urgency = next((s['urgency_score'] for s in skills if s['name'] == skill['name']), 0)
+                
                 cols = st.columns(table_width_ratio)
                 with cols[0]:
-                    st.write(row[t('col_path')])
+                    st.write(display_path)
                 with cols[1]:
-                    st.write(row[t('col_name')])
+                    st.write(skill['name'])
                 with cols[2]:
-                    prof_val = row[t('col_proficiency')]
+                    prof_val = int(skill.get('proficiency', 0))
                     st.markdown(color_box(prof_val, get_proficiency_color(prof_val)), unsafe_allow_html=True)
                 with cols[3]:
-                    prio_val = row[t('col_priority')]
+                    prio_val = int(skill.get('priority', 1))
                     st.markdown(color_box(prio_val, get_priority_color(prio_val)), unsafe_allow_html=True)
                 with cols[4]:
-                    st.write(row[t('col_urgency')])
+                    st.write(int(urgency))
                 with cols[5]:
-                    st.write(row[t('col_memo')])
-                with cols[6]:
+                    st.write(skill.get('memo', ''))
+                with cols[6]:  # 编辑按钮
                     with st.popover("✏️", use_container_width=True):
                         st.subheader(t("edit_skill_header"))
                         
-                        edited_name = st.text_input(t("skill_name_label"), value=row[t('col_name')], key=f"name_{i}")
+                        edited_name = st.text_input(t("skill_name_label"), value=skill['name'], key=f"name_{original_idx}")
                         
-                        all_paths_options = all_paths
-                        path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
-                        selected_path_index = all_paths_options.index(path_str) if path_str in all_paths_options else 0
-                        edited_path = st.selectbox(t("path_box_title"), options=all_paths_options, index=selected_path_index, key=f"path_{i}")
+                        path_str = skill.get('path', '')
+                        selected_path_index = all_paths.index(path_str) if path_str in all_paths else 0
+                        edited_path = st.selectbox(t("path_box_title"), options=all_paths, index=selected_path_index, key=f"path_{original_idx}")
 
-                        edited_proficiency = st.radio(t("proficiency_label"), options=[5, 4, 3, 2, 1, 0], index=[5, 4, 3, 2, 1, 0].index(row[t('col_proficiency')]), key=f"prof_{i}")
-                        edited_priority = st.radio(t("priority_label"), options=[3, 2, 1], index=[3, 2, 1].index(row[t('col_priority')]), key=f"prio_{i}")
-                        edited_memo = st.text_area(t("memo_label"), value=row[t('col_memo')], key=f"memo_{i}")
+                        edited_proficiency = st.radio(t("proficiency_label"), options=[5, 4, 3, 2, 1, 0], 
+                                                     index=[5, 4, 3, 2, 1, 0].index(int(skill.get('proficiency', 0))), 
+                                                     key=f"prof_{original_idx}")
+                        edited_priority = st.radio(t("priority_label"), options=[3, 2, 1], 
+                                                  index=[3, 2, 1].index(int(skill.get('priority', 1))), 
+                                                  key=f"prio_{original_idx}")
+                        edited_memo = st.text_area(t("memo_label"), value=skill.get('memo', ''), key=f"memo_{original_idx}")
 
-                        if st.button(t("save_skill_button"), key=f"save_{i}"):
+                        if st.button(t("save_skill_button"), key=f"save_{original_idx}"):
                             current_data = all_data.copy()
-                            
-                            original_skill_index = -1
-                            for idx, skill in enumerate(current_data):
-                                if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
-                                    original_skill_index = idx
+                            # ✅ 检查重复
+                            duplicate_found = False
+                            for check_idx, check_skill in enumerate(current_data):
+                                if check_idx != original_idx and check_skill['name'] == edited_name and check_skill['path'] == edited_path:
+                                    st.error(f"Skill '{edited_name}' already exists at path '{edited_path}'")
+                                    duplicate_found = True
                                     break
                             
-                            if original_skill_index != -1:
-                                current_data[original_skill_index] = {
+                            if not duplicate_found:
+                                current_data[original_idx] = {
                                     "name": edited_name,
                                     "path": edited_path,
                                     "proficiency": edited_proficiency,
@@ -648,50 +674,28 @@ if page == "home_view":
                                 save_data_and_clear_cache(current_data, active_profile)
                                 st.success(t("success_data_updated"))
                                 st.rerun()
-                            else:
-                                st.error("Could not find the skill to update.")
-                with cols[7]:
-                    if st.button("🗑️", key=f"del_{i}"):
+
+                with cols[7]:  # 删除按钮
+                    if st.button("🗑️", key=f"del_{original_idx}"):
                         current_data = all_data.copy()
-                        path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
-                        skill_to_delete_index = -1
-                        for idx, skill in enumerate(current_data):
-                            if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
-                                skill_to_delete_index = idx
-                                break
-                        
-                        if skill_to_delete_index != -1:
-                            current_data.pop(skill_to_delete_index)
-                            save_data_and_clear_cache(current_data, active_profile)
-                            st.success(t("skill_deleted_success", "Skill has been deleted."))
-                            st.rerun()
-                        else:
-                            st.error("Error: Could not find the skill to delete.")
-                with cols[8]:
-                    if st.button("⬆️", key=f"up_{i}"):
+                        current_data.pop(original_idx)
+                        save_data_and_clear_cache(current_data, active_profile)
+                        st.success(t("skill_deleted_success", "Skill has been deleted."))
+                        st.rerun()
+
+                with cols[8]:  # 上移
+                    if st.button("⬆️", key=f"up_{original_idx}"):
                         current_data = all_data.copy()
-                        original_skill_index = -1
-                        path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
-                        for idx, skill in enumerate(current_data):
-                            if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
-                                original_skill_index = idx
-                                break
-                        if original_skill_index > 0:
-                            current_data.insert(original_skill_index - 1, current_data.pop(original_skill_index))
+                        if original_idx > 0:
+                            current_data.insert(original_idx - 1, current_data.pop(original_idx))
                             save_data_and_clear_cache(current_data, active_profile)
                             st.rerun()
 
-                with cols[9]:
-                    if st.button("⬇️", key=f"down_{i}"):
+                with cols[9]:  # 下移
+                    if st.button("⬇️", key=f"down_{original_idx}"):
                         current_data = all_data.copy()
-                        original_skill_index = -1
-                        path_str = row[t('col_path')].replace(' ➤ ', '.') if isinstance(row[t('col_path')], str) else ''
-                        for idx, skill in enumerate(current_data):
-                            if skill['name'] == row[t('col_name')] and skill.get('path', '') == path_str:
-                                original_skill_index = idx
-                                break
-                        if original_skill_index < len(current_data) - 1 and original_skill_index != -1:
-                            current_data.insert(original_skill_index + 1, current_data.pop(original_skill_index))
+                        if original_idx < len(current_data) - 1:
+                            current_data.insert(original_idx + 1, current_data.pop(original_idx))
                             save_data_and_clear_cache(current_data, active_profile)
                             st.rerun()
 
@@ -777,28 +781,40 @@ elif page == "manage_view":
             new_part = st.text_input(t("add_child_step2"), placeholder=t("add_child_placeholder"))
             if st.button(t("add_node_button"), type="primary", use_container_width=True):
                 if new_part:
-                    new_part = new_part.strip().replace(".", "_")
-                    if not new_part: st.warning(t("error_name_empty"))
+                    new_part_cleaned = new_part.strip().replace(".", "_")
+                    if not new_part_cleaned: 
+                        st.warning(t("error_name_empty"))
                     else:
-                        new_path_def = f"{selected_parent}.{new_part}" if selected_parent != t("parent_top_level") else new_part
+                        new_path_def = f"{selected_parent}.{new_part_cleaned}" if selected_parent != t("parent_top_level") else new_part_cleaned
                         current_paths = load_defined_paths(active_profile)
                         if new_path_def not in current_paths:
-                            current_paths.append(new_path_def); save_defined_paths_and_clear_cache(list(set(current_paths)), active_profile)
+                            current_paths.append(new_path_def)
+                            # ❌ 原来：list(set(current_paths))
+                            # ✅ 改为：
+                            save_defined_paths_and_clear_cache(list(dict.fromkeys(current_paths)), active_profile)
                             st.success(t("success_path_added").format(path=new_path_def))
-                            st.session_state.remembered_parent = selected_parent # Remember for next time
+                            st.session_state.remembered_parent = selected_parent
                             st.rerun()
-                        else: st.warning(t("warning_path_exists"))
-                else: st.warning(t("error_path_input_empty"))
+                        else: 
+                            st.warning(t("warning_path_exists"))
+                else: 
+                    st.warning(t("error_path_input_empty"))
             with st.expander(t("manual_path_expander")):
                 manual_path_def = st.text_input(t("manual_path_input"), key="manual_path_def_page")
                 if st.button(t("manual_add_button"), key="manual_add"):
                     if manual_path_def:
                         current_paths = load_defined_paths(active_profile)
                         if manual_path_def not in current_paths:
-                            current_paths.append(manual_path_def); save_defined_paths_and_clear_cache(list(set(current_paths)), active_profile)
-                            st.success(t("success_path_added").format(path=manual_path_def)); st.rerun()
-                        else: st.warning(t("warning_path_exists"))
-                    else: st.warning(t("error_path_input_empty"))
+                            current_paths.append(manual_path_def)
+                            # ❌ 原来：list(set(current_paths))
+                            # ✅ 改为：
+                            save_defined_paths_and_clear_cache(list(dict.fromkeys(current_paths)), active_profile)
+                            st.success(t("success_path_added").format(path=manual_path_def))
+                            st.rerun()
+                        else: 
+                            st.warning(t("warning_path_exists"))
+                    else: 
+                        st.warning(t("error_path_input_empty"))
 
     with col2:
         with st.container(border=True):
